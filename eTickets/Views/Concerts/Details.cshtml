@@ -1,0 +1,107 @@
+﻿@model Concert
+@{
+    ViewData["Title"] = "Detalji o koncertu";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="card mb-12">
+            <div class="row g-0">
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h2 class="card-title">@Model.Name</h2>
+                        <hr />
+                        <p class="card-text">@Model.Description</p>
+                        <p class="card-text">
+                            <b>Mesto dogadjaja: </b>
+                            <a asp-controller="Venues" asp-action="Details" asp-route-id="@Model.VenueId">
+                                @Model.Venue.Name
+                            </a>
+                        </p>
+                        <p class="card-text">
+                            <b>Osoba: </b>
+                            <a asp-controller="Persons" asp-action="Details" asp-route-id="@Model.PersonId">
+                                @Model.Person.FullName
+                            </a>
+                        </p>
+                        <p class="card-text"><b>Kategorija: </b>@Model.ConcertCategory</p>
+                        <p class="card-text"><b>Dostupne od: </b>@Model.StartDate.ToString("dd MMM yy")</p>
+                        <p class="card-text"><b>Dostupne do: </b>@Model.EndDate.ToString("dd MMM yy")</p>
+                        <p class="card-text ">
+                            <b>Status: </b>
+                            @if (DateTime.Now >= Model.StartDate && DateTime.Now <= Model.EndDate)
+                            {
+                                <span class="badge bg-success text-white">DOSTUPNO</span>
+                            }
+                            else if (DateTime.Now > Model.EndDate)
+                            {
+                                <span class="badge bg-danger text-white">ISTEKLO</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary text-white">PREDSTOJEĆI</span>
+                            }
+                        </p>
+                        <p class="card-text">
+                            <b>Izvođači: </b>
+                            <hr />
+                            <div class="row">
+                                @foreach (var performer in Model.Performers_Concerts)
+                                {
+                                    <div class="column text-center">
+                                        <img src="@performer.Performer.ProfilePictureURL" class="img-thumbnail rounded-circle" style="max-width: 150px; margin-left:10px;" alt="@performer.Performer.FullName">
+                                        <br />
+                                        <a style="margin-left:10px" asp-controller="Performers" asp-action="Details" asp-route-id="@performer.PerformerId">@performer.Performer.FullName</a>
+                                    </div>
+                                }
+                            </div>
+                        </p>
+
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <img src="@Model.ImageURL" width="100%" height="100%" alt="@Model.Name">
+                </div>
+                <div class="col-md-12">
+                    <div class="card-footer">
+                        <p class="card-text">
+                            <a class="btn btn-outline-primary float-right" asp-action="Index">
+                                Nazad na listu
+                            </a>
+                            @if (User.Identity.IsAuthenticated && (User.IsInRole("User") || User.IsInRole("Admin")))
+                            {
+                                if (DateTime.Now < Model.EndDate)
+                                {
+                                    <a class="btn btn-success" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@Model.Id">
+                                        <i class="bi bi-cart-plus"></i> Dodaj u korpu ( @Model.Price.ToString("c"))
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-warning">
+                                        <i class="bi bi-cart-plus"></i> Karta je istekla ( @Model.Price.ToString("c"))
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                if (DateTime.Now < Model.EndDate)
+                                {
+                                    <a class="btn btn-success" asp-controller="Account" asp-action="Login" asp-route-id="@Model.Id">
+                                        <i class="bi bi-cart-plus"></i> Dodaj u korpu ( @Model.Price.ToString("c"))
+                                    </a>
+                                }
+                                  else
+                                {
+                                    <a class="btn btn-warning">
+                                        <i class="bi bi-cart-plus"></i> Karta je istekla ( @Model.Price.ToString("c"))
+                                    </a>
+                                }
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

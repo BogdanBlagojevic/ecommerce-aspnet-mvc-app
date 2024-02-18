@@ -1,0 +1,91 @@
+﻿@model IEnumerable<Concert>
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 col-xs-6 col-md-3 border-primary mb-3">
+            <div class="card mb-3" style="max-width: 540px; margin-left:35px">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <hr />
+                            <p class="card-text">@item.Description</p>
+                            <p class="card-text"><b>Mesto odrzavanja: </b>@item.Venue.Name</p>
+                            <p class="card-text"><b>Kategorija: </b>@item.ConcertCategory</p>
+                            <p class="card-text"><b>Dostupne od: </b>@item.StartDate.ToString("dd MMM yy")</p>
+                            <p class="card-text"><b>Dostupne do: </b>@item.EndDate.ToString("dd MMM yy")</p>
+                            <p class="card-text ">
+                                <b>Status: </b>
+                                @if (DateTime.Now >= item.StartDate && DateTime.Now <= item.EndDate)
+                                {
+                                    <span class="badge bg-success text-white">DOSTUPNE</span>
+                                }
+                                else if (DateTime.Now > item.EndDate)
+                                {
+                                    <span class="badge bg-danger text-white">ISTEKLO</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary text-white">PREDSTOJIECI</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <img src="@item.ImageURL" width="100%" alt="@item.Name">
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col">
+                                    @if (User.Identity.IsAuthenticated && (User.IsInRole("User") || User.IsInRole("Admin")))
+                                    {
+                                        if (DateTime.Now < item.EndDate)
+                                        {
+                                            <a class="btn btn-success" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@item.Id">
+                                                <i class="bi bi-cart-plus"></i> Dodaj u korpu ( @item.Price.ToString("c"))
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="btn btn-warning">
+                                                <i class="bi bi-cart-plus"></i> Karta je istekla ( @item.Price.ToString("c"))
+                                            </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (DateTime.Now < item.EndDate)
+                                        {
+                                            <a class="btn btn-success" asp-controller="Account" asp-action="Login" asp-route-id="@item.Id">
+                                                <i class="bi bi-cart-plus"></i> Dodaj u korpu ( @item.Price.ToString("c"))
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="btn btn-warning">
+                                                <i class="bi bi-cart-plus"></i> Karta je istekla ( @item.Price.ToString("c"))
+                                            </a>
+                                        }
+                                    }
+
+                                </div>
+                                <div class="col text-right">
+                                    <a class="btn btn-outline-primary" asp-action="Details" asp-route-id="@item.Id">
+                                        <i class="bi bi-eye-fill"></i> Prikazi Detalje
+                                    </a>
+                                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                                    {
+                                        <a class="btn btn-outline-info" asp-action="Edit" asp-route-id="@item.Id"><i class="bi bi-pencil-square"></i>Uredi</a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@await Html.PartialAsync("_CreateItem", "Concerts")

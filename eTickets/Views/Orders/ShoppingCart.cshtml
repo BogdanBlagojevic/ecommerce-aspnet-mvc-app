@@ -1,0 +1,70 @@
+﻿﻿@using eTickets.Data.ViewModels;
+@model ShoppingCartVM
+
+@{
+    ViewData["Title"] = "Pregled vaše korpe";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="text-center">
+            <h2>Pregled vaše korpe</h2>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Selected amount</th>
+                    <th>Movie</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ShoppingCart.ShoppingCartItems)
+                {
+                    <tr>
+                        <td class="align-middle">@item.Amount</td>
+                        <td class="align-middle">@item.Concert.Name</td>
+                        <td class="align-middle">@item.Concert.Price.ToString("c")</td>
+                        <td class="align-middle">@((item.Amount * item.Concert.Price).ToString("c"))</td>
+                        <td class="align-middle">
+                            <a class="text-danger" asp-controller="Orders" asp-action="RemoveItemFromShoppingCart"
+                               asp-route-id="@item.Concert.Id">
+                                <i class="bi bi-cart-dash"></i>
+                            </a>
+                            |
+                            <a class="text-success" asp-controller="Orders" asp-action="AddItemToShoppingCart"
+                               asp-route-id="@item.Concert.Id">
+                                <i class="bi bi-cart-plus"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2"></td>
+                    <td><b>Total:</b></td>
+                    <td>
+                        @Model.ShoppingCartTotal.ToString("c")
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="text-center">
+            <div class="btn-group">
+                <a class ="btn btn-outline-primary"  asp-action="CompleteOrder">
+                    Završi kupovinu 
+                </a>
+                <a class="btn btn-outline-success" asp-controller="Concerts" asp-action="Index">
+                    Dodaj još karata
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
